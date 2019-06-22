@@ -1,12 +1,14 @@
 module Simpler
   class PlainRender
+
+    TYPE = 'text/plain'
+
     def initialize(env)
       @env = env
-      @type = 'text/plain'
     end
 
     def result(binding)
-      {type: @type,
+      {type: TYPE,
        body: @env['simpler.render_type'].values.first,
        template: ''}
     end

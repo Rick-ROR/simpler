@@ -3,16 +3,17 @@ require 'erb'
 module Simpler
   class HtmlRender
 
+    TYPE = 'text/html'
+
     def initialize(env)
       @env = env
-      @type = 'text/html'
       @path = ''
     end
 
     def result(binding)
       template = File.read(template_path)
 
-      {type: @type,
+      {type: TYPE,
        body: ERB.new(template).result(binding),
        template: @path}
     end
