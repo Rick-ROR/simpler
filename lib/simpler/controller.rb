@@ -14,6 +14,7 @@ module Simpler
     def make_response(action)
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
+      @request.env['simpler.params'].each { |key, value| @request.update_param(key.to_sym, value)}
 
       set_default_headers
       send(action)
@@ -24,6 +25,14 @@ module Simpler
 
     private
 
+    def status(code)
+      @response.status = code
+    end
+
+    def header(key, v)
+      @response.set_header(key, v)
+    end
+
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
@@ -33,12 +42,14 @@ module Simpler
     end
 
     def write_response
-      body = render_body
+      content = render_response
 
-      @response.write(body)
+      @response.write(content[:body])
+      @response['Content-Type'] = content[:type]
+      @response['template'] = content[:template]
     end
 
-    def render_body
+    def render_response
       View.new(@request.env).render(binding)
     end
 
@@ -46,8 +57,8 @@ module Simpler
       @request.params
     end
 
-    def render(template)
-      @request.env['simpler.template'] = template
+    def render(type_hash)
+      @request.env['simpler.render_type'] = type_hash
     end
 
   end
